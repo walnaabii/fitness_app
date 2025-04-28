@@ -2,56 +2,83 @@
 
 {% block content %}
 <div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Add New Exercise</h2>
-        <a href="{{ url_for('admin.exercises') }}" class="btn btn-outline-secondary">
-            Back to Exercises
-        </a>
-    </div>
-
-    <div class="card">
-        <div class="card-body">
-            <form method="POST" action="{{ url_for('admin.new_exercise') }}">
-                <div class="mb-3">
-                    <label for="name" class="form-label">Exercise Name</label>
-                    <input type="text" class="form-control" id="name" name="name" required>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Add New Exercise</h4>
                 </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('admin.new_exercise') }}" class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Exercise Name</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                            <div class="invalid-feedback">Please provide an exercise name.</div>
+                        </div>
 
-                <div class="mb-3">
-                    <label for="muscle_group" class="form-label">Muscle Group</label>
-                    <select class="form-select" id="muscle_group" name="muscle_group" required>
-                        <option value="">Select Muscle Group</option>
-                        <option value="Chest">Chest</option>
-                        <option value="Back">Back</option>
-                        <option value="Legs">Legs</option>
-                        <option value="Shoulders">Shoulders</option>
-                        <option value="Arms">Arms</option>
-                        <option value="Core">Core</option>
-                    </select>
+                        <div class="mb-3">
+                            <label for="muscle_group" class="form-label">Muscle Group</label>
+                            <select class="form-select" id="muscle_group" name="muscle_group" required>
+                                <option value="">Select Muscle Group</option>
+                                <option value="Chest">Chest</option>
+                                <option value="Back">Back</option>
+                                <option value="Legs">Legs</option>
+                                <option value="Shoulders">Shoulders</option>
+                                <option value="Arms">Arms</option>
+                                <option value="Core">Core</option>
+                                <option value="Full Body">Full Body</option>
+                                <option value="Cardio">Cardio</option>
+                            </select>
+                            <div class="invalid-feedback">Please select a muscle group.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="equipment" class="form-label">Equipment</label>
+                            <select class="form-select" id="equipment" name="equipment" required>
+                                <option value="">Select Equipment</option>
+                                <option value="Bodyweight">Bodyweight</option>
+                                <option value="Dumbbells">Dumbbells</option>
+                                <option value="Barbell">Barbell</option>
+                                <option value="Machine">Machine</option>
+                                <option value="Kettlebell">Kettlebell</option>
+                                <option value="Resistance Bands">Resistance Bands</option>
+                                <option value="Cable Machine">Cable Machine</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <div class="invalid-feedback">Please select equipment type.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+                            <div class="invalid-feedback">Please provide an exercise description.</div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Add Exercise</button>
+                            <a href="{{ url_for('admin.exercises') }}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
                 </div>
-
-                <div class="mb-3">
-                    <label for="equipment" class="form-label">Equipment</label>
-                    <input type="text" class="form-control" id="equipment" name="equipment" required>
-                </div>
-
-                <div class="mb-3">
-                    <label for="description" class="form-label">Description</label>
-                    <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
-                </div>
-
-                <div class="mb-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="is_active" name="is_active" checked>
-                        <label class="form-check-label" for="is_active">
-                            Active
-                        </label>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn btn-primary">Add Exercise</button>
-            </form>
+            </div>
         </div>
     </div>
 </div>
+
+<script>
+    // Form validation
+    (function () {
+        'use strict'
+        const forms = document.querySelectorAll('.needs-validation')
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+    })()
+</script>
 {% endblock %} 

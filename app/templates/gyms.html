@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Hero Section -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold">Our Gyms</h1>
+        <p class="lead text-muted">Find the perfect gym for your fitness journey</p>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="input-group">
+                <input type="text" class="form-control" id="searchInput" placeholder="Search gyms...">
+                <button class="btn btn-outline-secondary" type="button">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <select class="form-select" id="locationFilter">
+                <option value="">All Locations</option>
+                {% for gym in gyms %}
+                    {% if gym.location not in locations %}
+                        <option value="{{ gym.location }}">{{ gym.location }}</option>
+                        {% set _ = locations.append(gym.location) %}
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <!-- Gyms Grid -->
+    <div class="row g-4" id="gymsContainer">
+        {% for gym in gyms %}
+        <div class="col-md-6 col-lg-4 gym-card" data-location="{{ gym.location }}">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h5 class="card-title mb-0">{{ gym.name }}</h5>
+                        <span class="badge bg-primary">{{ gym.location }}</span>
+                    </div>
+                    <p class="card-text text-muted">{{ gym.description }}</p>
+                </div>
+                <div class="card-footer bg-white border-top-0">
+                    <div class="d-grid">
+                        <a href="{{ url_for('main.booking') }}" class="btn btn-primary">
+                            <i class="bi bi-calendar-check"></i> Book a Session
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- No Results Message -->
+    <div id="noResults" class="text-center mt-4 d-none">
+        <h4>No gyms found</h4>
+        <p class="text-muted">Try adjusting your search or filters</p>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const locationFilter = document.getElementById('locationFilter');
+        const gymsContainer = document.getElementById('gymsContainer');
+        const noResults = document.getElementById('noResults');
+        const gymCards = document.querySelectorAll('.gym-card');
+
+        function filterGyms() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const location = locationFilter.value;
+            let visibleCount = 0;
+
+            gymCards.forEach(card => {
+                const gymName = card.querySelector('.card-title').textContent.toLowerCase();
+                const gymLocation = card.dataset.location;
+                const matchesSearch = gymName.includes(searchTerm);
+                const matchesLocation = !location || gymLocation === location;
+
+                if (matchesSearch && matchesLocation) {
+                    card.style.display = '';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            noResults.classList.toggle('d-none', visibleCount > 0);
+        }
+
+        searchInput.addEventListener('input', filterGyms);
+        locationFilter.addEventListener('change', filterGyms);
+    });
+</script>
+
+<style>
+    .gym-card {
+        transition: transform 0.2s;
+    }
+    .gym-card:hover {
+        transform: translateY(-5px);
+    }
+    .card {
+        border-radius: 10px;
+    }
+    .badge {
+        font-size: 0.9rem;
+        padding: 0.5em 0.8em;
+    }
+</style>
+{% endblock %}

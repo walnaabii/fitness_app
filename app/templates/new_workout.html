@@ -4,31 +4,34 @@
 <div class="container mt-4">
     <h2 class="mb-4">Create New Workout</h2>
     
-    <form method="POST" action="{{ url_for('main.new_workout') }}" id="workoutForm">
+    <form method="POST" action="{{ url_for('main.new_workout') }}" class="needs-validation" novalidate>
+        <!-- Basic Workout Info -->
         <div class="card mb-4">
             <div class="card-body">
                 <div class="mb-3">
                     <label for="workout_name" class="form-label">Workout Name</label>
                     <input type="text" class="form-control" id="workout_name" name="workout_name" required>
+                    <div class="invalid-feedback">Please provide a workout name.</div>
                 </div>
                 <div class="mb-3">
-                    <label for="notes" class="form-label">Notes</label>
-                    <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+                    <label for="notes" class="form-label">Notes (Optional)</label>
+                    <textarea class="form-control" id="notes" name="notes" rows="2"></textarea>
                 </div>
             </div>
         </div>
 
+        <!-- Exercises Section -->
         <div class="card mb-4">
-            <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="card-header">
                 <h5 class="mb-0">Exercises</h5>
-                <button type="button" class="btn btn-primary btn-sm" onclick="addExercise()">
-                    Add Exercise
-                </button>
             </div>
             <div class="card-body">
                 <div id="exercisesContainer">
                     <!-- Exercise rows will be added here -->
                 </div>
+                <button type="button" class="btn btn-outline-primary mt-3" onclick="addExercise()">
+                    <i class="bi bi-plus-circle"></i> Add Exercise
+                </button>
             </div>
         </div>
 
@@ -40,15 +43,13 @@
 </div>
 
 <script>
-    let exerciseCount = 0;
-
     function addExercise() {
         const container = document.getElementById('exercisesContainer');
         const exerciseRow = document.createElement('div');
         exerciseRow.className = 'exercise-row mb-3 p-3 border rounded';
         exerciseRow.innerHTML = `
-            <div class="row">
-                <div class="col-md-4">
+            <div class="row g-3">
+                <div class="col-md-5">
                     <label class="form-label">Exercise</label>
                     <select class="form-select" name="exercise_id" required>
                         <option value="">Select Exercise</option>
@@ -59,46 +60,48 @@
                 </div>
                 <div class="col-md-2">
                     <label class="form-label">Sets</label>
-                    <input type="number" class="form-control" name="sets" min="1">
+                    <input type="number" class="form-control" name="sets" min="1" placeholder="3">
                 </div>
                 <div class="col-md-2">
                     <label class="form-label">Reps</label>
-                    <input type="number" class="form-control" name="reps" min="1">
+                    <input type="number" class="form-control" name="reps" min="1" placeholder="12">
                 </div>
                 <div class="col-md-2">
                     <label class="form-label">Weight (kg)</label>
-                    <input type="number" class="form-control" name="weight" step="0.1" min="0">
+                    <input type="number" class="form-control" name="weight" step="0.1" min="0" placeholder="20">
                 </div>
-                <div class="col-md-2">
-                    <label class="form-label">Duration (min)</label>
-                    <input type="number" class="form-control" name="duration" min="1">
-                </div>
-            </div>
-            <div class="row mt-2">
-                <div class="col-12">
-                    <label class="form-label">Notes</label>
-                    <input type="text" class="form-control" name="exercise_notes">
-                </div>
-            </div>
-            <div class="row mt-2">
-                <div class="col-12 text-end">
-                    <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeExercise(this)">
-                        Remove Exercise
+                <div class="col-md-1">
+                    <label class="form-label">&nbsp;</label>
+                    <button type="button" class="btn btn-outline-danger w-100" onclick="removeExercise(this)">
+                        <i class="bi bi-trash"></i>
                     </button>
                 </div>
             </div>
         `;
         container.appendChild(exerciseRow);
-        exerciseCount++;
     }
 
     function removeExercise(button) {
         const exerciseRow = button.closest('.exercise-row');
         exerciseRow.remove();
-        exerciseCount--;
     }
 
     // Add first exercise row on page load
     document.addEventListener('DOMContentLoaded', addExercise);
+
+    // Form validation
+    (function () {
+        'use strict'
+        const forms = document.querySelectorAll('.needs-validation')
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+    })()
 </script>
 {% endblock %} 

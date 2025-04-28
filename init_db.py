@@ -15,10 +15,10 @@ def init_db():
                 is_admin=True,
                 is_active=True
             )
-            admin.set_password('admin123')
+            admin.set_password('admin')
             db.session.add(admin)
             db.session.commit()
-            print("Created admin user")
+            print("Created admin user with username: admin and password: admin")
 
 if __name__ == '__main__':
     init_db()

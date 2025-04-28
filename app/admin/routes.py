@@ -37,11 +37,15 @@ def dashboard():
 
     # Workout statistics
     total_workouts = Workout.query.count()
-    recent_workouts = Workout.query.filter(Workout.date >= datetime.utcnow() - timedelta(days=7)).count()
+    recent_workouts_count = Workout.query.filter(Workout.date >= datetime.utcnow() - timedelta(days=7)).count()
+    recent_workouts = Workout.query.order_by(Workout.date.desc()).limit(5).all()
 
     # Exercise statistics
     total_exercises = Exercise.query.count()
     active_exercises = Exercise.query.filter_by(is_active=True).count()
+
+    # Recent users
+    recent_users = User.query.order_by(User.created_at.desc()).limit(5).all()
 
     return render_template('admin/dashboard.html',
                          total_users=total_users,
@@ -50,9 +54,11 @@ def dashboard():
                          total_gyms=total_gyms,
                          active_gyms=active_gyms,
                          total_workouts=total_workouts,
+                         recent_workouts_count=recent_workouts_count,
                          recent_workouts=recent_workouts,
                          total_exercises=total_exercises,
-                         active_exercises=active_exercises)
+                         active_exercises=active_exercises,
+                         recent_users=recent_users)
 
 @admin.route('/users')
 @login_required
@@ -85,9 +91,13 @@ def new_gym():
     if request.method == 'POST':
         name = request.form.get('name')
         location = request.form.get('location')
-        description = request.form.get('description')
+        is_active = request.form.get('is_active') == 'on'
 
-        new_gym = Gym(name=name, location=location, description=description)
+        new_gym = Gym(
+            name=name,
+            location=location,
+            is_active=is_active
+        )
         db.session.add(new_gym)
         db.session.commit()
         flash('Gym added successfully!', 'success')

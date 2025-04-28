@@ -32,6 +32,13 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('main.booking') }}">Bookings</a>
                         </li>
+                        {% if current_user.is_admin %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin.dashboard') }}">
+                                <i class="bi bi-speedometer2"></i> Admin Dashboard
+                            </a>
+                        </li>
+                        {% endif %}
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('main.logout') }}">Logout</a>
                         </li>

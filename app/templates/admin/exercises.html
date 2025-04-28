@@ -3,15 +3,10 @@
 {% block content %}
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Exercise Management</h2>
-        <div>
-            <a href="{{ url_for('admin.new_exercise') }}" class="btn btn-primary">
-                Add New Exercise
-            </a>
-            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-secondary">
-                Back to Dashboard
-            </a>
-        </div>
+        <h2>Manage Exercises</h2>
+        <a href="{{ url_for('admin.new_exercise') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Add New Exercise
+        </a>
     </div>
 
     <div class="card">
@@ -24,33 +19,28 @@
                             <th>Muscle Group</th>
                             <th>Equipment</th>
                             <th>Status</th>
-                            <th>Created</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for exercise in exercises %}
-                            <tr>
-                                <td>{{ exercise.name }}</td>
-                                <td>{{ exercise.muscle_group }}</td>
-                                <td>{{ exercise.equipment }}</td>
-                                <td>
-                                    <span class="badge bg-{{ 'success' if exercise.is_active else 'danger' }}">
-                                        {{ 'Active' if exercise.is_active else 'Inactive' }}
-                                    </span>
-                                </td>
-                                <td>{{ exercise.created_at.strftime('%Y-%m-%d') }}</td>
-                                <td>
-                                    <form action="{{ url_for('admin.toggle_exercise', exercise_id=exercise.id) }}" 
-                                          method="POST" 
-                                          class="d-inline">
-                                        <button type="submit" 
-                                                class="btn btn-sm btn-{{ 'danger' if exercise.is_active else 'success' }}">
-                                            {{ 'Deactivate' if exercise.is_active else 'Activate' }}
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
+                        <tr>
+                            <td>{{ exercise.name }}</td>
+                            <td>{{ exercise.muscle_group }}</td>
+                            <td>{{ exercise.equipment }}</td>
+                            <td>
+                                <span class="badge {% if exercise.is_active %}bg-success{% else %}bg-danger{% endif %}">
+                                    {{ 'Active' if exercise.is_active else 'Inactive' }}
+                                </span>
+                            </td>
+                            <td>
+                                <form method="POST" action="{{ url_for('admin.toggle_exercise', exercise_id=exercise.id) }}" class="d-inline">
+                                    <button type="submit" class="btn btn-sm {% if exercise.is_active %}btn-warning{% else %}btn-success{% endif %}">
+                                        {{ 'Deactivate' if exercise.is_active else 'Activate' }}
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
                         {% endfor %}
                     </tbody>
                 </table>

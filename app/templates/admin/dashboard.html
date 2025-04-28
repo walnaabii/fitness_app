@@ -29,7 +29,7 @@
                 <div class="card-body">
                     <h5 class="card-title">Total Workouts</h5>
                     <h2 class="card-text">{{ total_workouts }}</h2>
-                    <p class="card-text">Recent: {{ recent_workouts }}</p>
+                    <p class="card-text">Recent: {{ recent_workouts_count }}</p>
                 </div>
             </div>
         </div>
@@ -61,9 +61,6 @@
                         </a>
                         <a href="{{ url_for('admin.users') }}" class="btn btn-info">
                             Manage Users
-                        </a>
-                        <a href="{{ url_for('admin.analytics') }}" class="btn btn-warning">
-                            View Analytics
                         </a>
                     </div>
                 </div>

@@ -1,10 +1,72 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Fitness App - Home</title>
-</head>
-<body>
-    <h1>Welcome to Fitness Oman</h1>
-    <a href="/gyms">Browse Gyms</a> | <a href="/profile">Your Profile</a> | <a href="/booking">Book a Session</a>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section text-center py-5 bg-primary text-white">
+    <div class="container">
+        <h1 class="display-4 fw-bold mb-4">Welcome to Fitness Oman</h1>
+        <p class="lead mb-4">Your journey to a healthier lifestyle starts here</p>
+        {% if not current_user.is_authenticated %}
+            <a href="{{ url_for('main.register') }}" class="btn btn-light btn-lg me-2">Get Started</a>
+            <a href="{{ url_for('main.login') }}" class="btn btn-outline-light btn-lg">Login</a>
+        {% else %}
+            <a href="{{ url_for('main.profile') }}" class="btn btn-light btn-lg me-2">View Profile</a>
+            <a href="{{ url_for('main.workouts') }}" class="btn btn-outline-light btn-lg me-2">Start Workout</a>
+            {% if current_user.is_admin %}
+            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-warning btn-lg">
+                <i class="bi bi-speedometer2"></i> Admin Dashboard
+            </a>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="container py-5">
+    <div class="row text-center">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <i class="bi bi-geo-alt-fill text-primary display-4 mb-3"></i>
+                    <h3 class="card-title">Find Gyms</h3>
+                    <p class="card-text">Discover the best gyms in your area with our comprehensive directory.</p>
+                    <a href="{{ url_for('main.gyms') }}" class="btn btn-outline-primary">Browse Gyms</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <i class="bi bi-calendar-check-fill text-primary display-4 mb-3"></i>
+                    <h3 class="card-title">Book Sessions</h3>
+                    <p class="card-text">Schedule your workout sessions with ease and manage your fitness routine.</p>
+                    <a href="{{ url_for('main.booking') }}" class="btn btn-outline-primary">Book Now</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <i class="bi bi-graph-up-fill text-primary display-4 mb-3"></i>
+                    <h3 class="card-title">Track Progress</h3>
+                    <p class="card-text">Monitor your fitness journey with our comprehensive tracking tools.</p>
+                    <a href="{{ url_for('main.profile') }}" class="btn btn-outline-primary">View Profile</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Call to Action Section -->
+<div class="bg-light py-5">
+    <div class="container text-center">
+        <h2 class="mb-4">Ready to Transform Your Fitness Journey?</h2>
+        <p class="lead mb-4">Join thousands of members who have already started their fitness transformation.</p>
+        {% if not current_user.is_authenticated %}
+            <a href="{{ url_for('main.register') }}" class="btn btn-primary btn-lg">Join Now</a>
+        {% else %}
+            <a href="{{ url_for('main.workouts') }}" class="btn btn-primary btn-lg">Start Workout</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
