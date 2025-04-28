@@ -12,11 +12,6 @@ main = Blueprint('main', __name__)
 def home():
     return render_template('home.html')
 
-@main.route('/gyms')
-def gyms():
-    all_gyms = Gym.query.all()
-    return render_template('gym_list.html', gyms=all_gyms)
-
 @main.route('/profile')
 @login_required
 def profile():

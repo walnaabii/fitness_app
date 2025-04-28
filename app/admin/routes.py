@@ -15,6 +15,13 @@ def admin_required(f):
     decorated_function.__name__ = f.__name__
     return decorated_function
 
+# Add a route for /gyms that redirects to /admin/gyms
+@admin.route('/gyms', endpoint='gyms_redirect')
+@login_required
+@admin_required
+def gyms_redirect():
+    return redirect(url_for('admin.gyms'))
+
 @admin.route('/dashboard')
 @login_required
 @admin_required
@@ -64,7 +71,7 @@ def toggle_user(user_id):
     flash(f'User {user.username} has been {"activated" if user.is_active else "deactivated"}.', 'success')
     return redirect(url_for('admin.users'))
 
-@admin.route('/gyms')
+@admin.route('/admin/gyms')
 @login_required
 @admin_required
 def gyms():
