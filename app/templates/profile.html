@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3>Your Fitness Profile</h3>
+                    <a href="{{ url_for('main.logout') }}" class="btn btn-outline-danger">Logout</a>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Personal Information</h5>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                    <strong>Username:</strong> {{ user.username }}
+                                </li>
+                                <li class="list-group-item">
+                                    <strong>Email:</strong> {{ user.email }}
+                                </li>
+                                <li class="list-group-item">
+                                    <strong>Age:</strong> {{ user.age if user.age else 'Not specified' }}
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Fitness Information</h5>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                    <strong>Weight:</strong> {{ user.weight if user.weight else 'Not specified' }} kg
+                                </li>
+                                <li class="list-group-item">
+                                    <strong>Height:</strong> {{ user.height if user.height else 'Not specified' }} cm
+                                </li>
+                                <li class="list-group-item">
+                                    <strong>Fitness Goal:</strong> {{ user.fitness_goal if user.fitness_goal else 'Not specified' }}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('main.booking') }}" class="btn btn-primary">Book a Gym Session</a>
+                        <a href="{{ url_for('main.gyms') }}" class="btn btn-outline-primary">View Available Gyms</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
