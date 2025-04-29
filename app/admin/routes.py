@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
-from ..models import User, Gym, Exercise, Workout, Analytics, db
+from ..models import User, Gym, Exercise, Workout, db
 from datetime import datetime, timedelta
 from sqlalchemy import func
 
@@ -15,11 +15,42 @@ def admin_required(f):
     decorated_function.__name__ = f.__name__
     return decorated_function
 
-# Add a route for /gyms that redirects to /admin/gyms
-@admin.route('/gyms', endpoint='gyms_redirect')
+@admin.route('/gyms')
 @login_required
 @admin_required
-def gyms_redirect():
+def gyms():
+    gyms = Gym.query.all()
+    return render_template('admin/gyms.html', gyms=gyms)
+
+@admin.route('/gym/new', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def new_gym():
+    if request.method == 'POST':
+        name = request.form.get('name')
+        location = request.form.get('location')
+        is_active = request.form.get('is_active') == 'on'
+
+        new_gym = Gym(
+            name=name,
+            location=location,
+            is_active=is_active
+        )
+        db.session.add(new_gym)
+        db.session.commit()
+        flash('Gym added successfully!', 'success')
+        return redirect(url_for('admin.gyms'))
+
+    return render_template('admin/new_gym.html')
+
+@admin.route('/gym/<int:gym_id>/toggle', methods=['POST'])
+@login_required
+@admin_required
+def toggle_gym(gym_id):
+    gym = Gym.query.get_or_404(gym_id)
+    gym.is_active = not gym.is_active
+    db.session.commit()
+    flash(f'Gym {gym.name} has been {"activated" if gym.is_active else "deactivated"}.', 'success')
     return redirect(url_for('admin.gyms'))
 
 @admin.route('/dashboard')
@@ -75,109 +106,4 @@ def toggle_user(user_id):
     user.is_active = not user.is_active
     db.session.commit()
     flash(f'User {user.username} has been {"activated" if user.is_active else "deactivated"}.', 'success')
-    return redirect(url_for('admin.users'))
-
-@admin.route('/admin/gyms')
-@login_required
-@admin_required
-def gyms():
-    gyms = Gym.query.all()
-    return render_template('admin/gyms.html', gyms=gyms)
-
-@admin.route('/gym/new', methods=['GET', 'POST'])
-@login_required
-@admin_required
-def new_gym():
-    if request.method == 'POST':
-        name = request.form.get('name')
-        location = request.form.get('location')
-        is_active = request.form.get('is_active') == 'on'
-
-        new_gym = Gym(
-            name=name,
-            location=location,
-            is_active=is_active
-        )
-        db.session.add(new_gym)
-        db.session.commit()
-        flash('Gym added successfully!', 'success')
-        return redirect(url_for('admin.gyms'))
-
-    return render_template('admin/new_gym.html')
-
-@admin.route('/gym/<int:gym_id>/toggle', methods=['POST'])
-@login_required
-@admin_required
-def toggle_gym(gym_id):
-    gym = Gym.query.get_or_404(gym_id)
-    gym.is_active = not gym.is_active
-    db.session.commit()
-    flash(f'Gym {gym.name} has been {"activated" if gym.is_active else "deactivated"}.', 'success')
-    return redirect(url_for('admin.gyms'))
-
-@admin.route('/exercises')
-@login_required
-@admin_required
-def exercises():
-    exercises = Exercise.query.all()
-    return render_template('admin/exercises.html', exercises=exercises)
-
-@admin.route('/exercise/new', methods=['GET', 'POST'])
-@login_required
-@admin_required
-def new_exercise():
-    if request.method == 'POST':
-        name = request.form.get('name')
-        description = request.form.get('description')
-        muscle_group = request.form.get('muscle_group')
-        equipment = request.form.get('equipment')
-
-        new_exercise = Exercise(
-            name=name,
-            description=description,
-            muscle_group=muscle_group,
-            equipment=equipment
-        )
-        db.session.add(new_exercise)
-        db.session.commit()
-        flash('Exercise added successfully!', 'success')
-        return redirect(url_for('admin.exercises'))
-
-    return render_template('admin/new_exercise.html')
-
-@admin.route('/exercise/<int:exercise_id>/toggle', methods=['POST'])
-@login_required
-@admin_required
-def toggle_exercise(exercise_id):
-    exercise = Exercise.query.get_or_404(exercise_id)
-    exercise.is_active = not exercise.is_active
-    db.session.commit()
-    flash(f'Exercise {exercise.name} has been {"activated" if exercise.is_active else "deactivated"}.', 'success')
-    return redirect(url_for('admin.exercises'))
-
-@admin.route('/analytics')
-@login_required
-@admin_required
-def analytics():
-    # User growth
-    user_growth = db.session.query(
-        func.date(User.created_at).label('date'),
-        func.count(User.id).label('count')
-    ).group_by(func.date(User.created_at)).all()
-
-    # Workout trends
-    workout_trends = db.session.query(
-        func.date(Workout.date).label('date'),
-        func.count(Workout.id).label('count')
-    ).group_by(func.date(Workout.date)).all()
-
-    # Popular exercises
-    popular_exercises = db.session.query(
-        Exercise.name,
-        func.count(WorkoutExercise.id).label('count')
-    ).join(WorkoutExercise).group_by(Exercise.id).order_by(func.count(WorkoutExercise.id).desc()).limit(10).all()
-
-    return render_template('admin/analytics.html',
-                         user_growth=user_growth,
-                         workout_trends=workout_trends,
-                         popular_exercises=popular_exercises) 
+    return redirect(url_for('admin.users')) 

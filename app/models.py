@@ -12,7 +12,6 @@ class Gym(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(150), nullable=False)
     location = db.Column(db.String(150))
-    description = db.Column(db.Text)
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -22,10 +21,6 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(150), unique=True, nullable=False)
     email = db.Column(db.String(150), unique=True, nullable=False)
     password_hash = db.Column(db.String(150))
-    age = db.Column(db.Integer)
-    weight = db.Column(db.Float)
-    height = db.Column(db.Float)
-    fitness_goal = db.Column(db.String(150))
     is_admin = db.Column(db.Boolean, default=False)
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -47,6 +42,79 @@ class Exercise(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     workout_exercises = db.relationship('WorkoutExercise', backref='exercise', lazy=True)
 
+    # Pre-set exercises
+    PRESET_EXERCISES = [
+        {
+            'name': 'Bench Press',
+            'description': 'Lie on a bench and press a barbell or dumbbells upward from chest level.',
+            'muscle_group': 'Chest',
+            'equipment': 'Barbell, Bench'
+        },
+        {
+            'name': 'Squats',
+            'description': 'Stand with feet shoulder-width apart and lower body by bending knees and hips.',
+            'muscle_group': 'Legs',
+            'equipment': 'Barbell, Squat Rack'
+        },
+        {
+            'name': 'Deadlift',
+            'description': 'Lift a barbell from the ground to hip level while keeping back straight.',
+            'muscle_group': 'Back',
+            'equipment': 'Barbell'
+        },
+        {
+            'name': 'Pull-ups',
+            'description': 'Hang from a bar and pull body up until chin is above the bar.',
+            'muscle_group': 'Back',
+            'equipment': 'Pull-up Bar'
+        },
+        {
+            'name': 'Push-ups',
+            'description': 'Lower and raise body using arms while keeping body straight.',
+            'muscle_group': 'Chest',
+            'equipment': 'None'
+        },
+        {
+            'name': 'Shoulder Press',
+            'description': 'Press weights overhead while standing or sitting.',
+            'muscle_group': 'Shoulders',
+            'equipment': 'Dumbbells, Barbell'
+        },
+        {
+            'name': 'Bicep Curls',
+            'description': 'Curl weights upward while keeping elbows close to body.',
+            'muscle_group': 'Arms',
+            'equipment': 'Dumbbells, Barbell'
+        },
+        {
+            'name': 'Tricep Dips',
+            'description': 'Lower and raise body using parallel bars, focusing on triceps.',
+            'muscle_group': 'Arms',
+            'equipment': 'Parallel Bars'
+        },
+        {
+            'name': 'Plank',
+            'description': 'Hold a push-up position with forearms on the ground.',
+            'muscle_group': 'Core',
+            'equipment': 'None'
+        },
+        {
+            'name': 'Lunges',
+            'description': 'Step forward and lower body until front knee is at 90 degrees.',
+            'muscle_group': 'Legs',
+            'equipment': 'None'
+        }
+    ]
+
+    @classmethod
+    def initialize_preset_exercises(cls):
+        """Initialize the database with preset exercises if they don't exist."""
+        for exercise_data in cls.PRESET_EXERCISES:
+            if not cls.query.filter_by(name=exercise_data['name']).first():
+                exercise = cls(**exercise_data, is_active=True)
+                db.session.add(exercise)
+        db.session.commit()
+
 class Workout(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(150), nullable=False)
@@ -62,12 +130,16 @@ class WorkoutExercise(db.Model):
     sets = db.Column(db.Integer)
     reps = db.Column(db.Integer)
     weight = db.Column(db.Float)
-    duration = db.Column(db.Integer)  # in minutes
     notes = db.Column(db.Text)
 
-class Analytics(db.Model):
+class Booking(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    metric = db.Column(db.String(100), nullable=False)
-    value = db.Column(db.Float)
-    date = db.Column(db.DateTime, default=datetime.utcnow)
-    category = db.Column(db.String(100))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    gym_id = db.Column(db.Integer, db.ForeignKey('gym.id'), nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    time_slot = db.Column(db.String(10), nullable=False)  # Format: "HH:MM"
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    user = db.relationship('User', backref='user_bookings')
+    gym = db.relationship('Gym', backref='gym_bookings')

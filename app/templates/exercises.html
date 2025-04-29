@@ -2,26 +2,22 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2 class="mb-4">Exercise Library</h2>
+    <h2 class="mb-4">Available Exercises</h2>
 
     <div class="row">
         {% for exercise in exercises %}
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ exercise.name }}</h5>
-                        {% if exercise.muscle_group %}
-                            <span class="badge bg-primary mb-2">{{ exercise.muscle_group }}</span>
-                        {% endif %}
-                        {% if exercise.equipment %}
-                            <span class="badge bg-secondary mb-2">{{ exercise.equipment }}</span>
-                        {% endif %}
-                        {% if exercise.description %}
-                            <p class="card-text">{{ exercise.description }}</p>
-                        {% endif %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{ exercise.name }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">{{ exercise.muscle_group }}</h6>
+                    <p class="card-text">{{ exercise.description }}</p>
+                    <div class="mt-3">
+                        <span class="badge bg-info">Equipment: {{ exercise.equipment }}</span>
                     </div>
                 </div>
             </div>
+        </div>
         {% endfor %}
     </div>
 </div>

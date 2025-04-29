@@ -1,13 +1,12 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash
-from .models import Gym, User, Workout, Exercise, WorkoutExercise
+from .models import Gym, User, Workout, Exercise, WorkoutExercise, Booking
 from . import db
 from datetime import datetime
 
 main = Blueprint('main', __name__)
 
-# Existing routes...
 @main.route('/')
 def home():
     return render_template('home.html')
@@ -17,25 +16,31 @@ def home():
 def profile():
     return render_template('profile.html', user=current_user)
 
-@main.route('/booking')
+@main.route('/booking', methods=['GET', 'POST'])
+@login_required
 def booking():
-    return render_template('booking.html')
-
-# 🔥 New Admin Route
-@main.route('/admin/add-gym', methods=['GET', 'POST'])
-def add_gym():
     if request.method == 'POST':
-        name = request.form['name']
-        location = request.form['location']
-        description = request.form['description']
-
-        new_gym = Gym(name=name, location=location, description=description)
-        db.session.add(new_gym)
+        gym_id = request.form.get('gym_id')
+        date = request.form.get('date')
+        time_slot = request.form.get('time_slot')
+        
+        # Create new booking
+        booking = Booking(
+            user_id=current_user.id,
+            gym_id=gym_id,
+            date=datetime.strptime(date, '%Y-%m-%d').date(),
+            time_slot=time_slot
+        )
+        db.session.add(booking)
         db.session.commit()
-
-        return redirect(url_for('main.gyms'))
+        
+        flash('Booking successful!', 'success')
+        return redirect(url_for('main.booking'))
     
-    return render_template('add_gym.html')
+    # GET request - show the booking form and existing bookings
+    gyms = Gym.query.filter_by(is_active=True).all()
+    user_bookings = Booking.query.filter_by(user_id=current_user.id).order_by(Booking.date, Booking.time_slot).all()
+    return render_template('booking.html', gyms=gyms, now=datetime.utcnow(), bookings=user_bookings)
 
 @main.route('/register', methods=['GET', 'POST'])
 def register():
@@ -46,10 +51,6 @@ def register():
         username = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
-        age = request.form.get('age')
-        weight = request.form.get('weight')
-        height = request.form.get('height')
-        fitness_goal = request.form.get('fitness_goal')
 
         # Check if username or email already exists
         user = User.query.filter_by(username=username).first()
@@ -65,11 +66,7 @@ def register():
         # Create new user
         new_user = User(
             username=username,
-            email=email,
-            age=age if age else None,
-            weight=float(weight) if weight else None,
-            height=float(height) if height else None,
-            fitness_goal=fitness_goal
+            email=email
         )
         new_user.set_password(password)
 
@@ -210,11 +207,20 @@ def delete_workout(workout_id):
 @main.route('/exercises')
 @login_required
 def exercises():
-    exercises = Exercise.query.all()
+    exercises = Exercise.query.filter_by(is_active=True).order_by(Exercise.name).all()
     return render_template('exercises.html', exercises=exercises)
 
 @main.route('/gyms')
 def gyms():
     gyms = Gym.query.filter_by(is_active=True).all()
-    locations = []
-    return render_template('gyms.html', gyms=gyms, locations=locations)
+    return render_template('gyms.html', gyms=gyms)
+
+@main.route('/debug/exercises')
+def debug_exercises():
+    exercises = Exercise.query.all()
+    return jsonify([{
+        'id': e.id,
+        'name': e.name,
+        'muscle_group': e.muscle_group,
+        'is_active': e.is_active
+    } for e in exercises])

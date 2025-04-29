@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Book a Gym Session</h2>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('main.booking') }}">
+                <div class="mb-3">
+                    <label for="gym_id" class="form-label">Select Gym</label>
+                    <select class="form-select" id="gym_id" name="gym_id" required>
+                        <option value="" selected disabled>Choose a gym...</option>
+                        {% for gym in gyms %}
+                        <option value="{{ gym.id }}">{{ gym.name }} - {{ gym.location }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="date" class="form-label">Select Date</label>
+                    <input type="date" class="form-control" id="date" name="date" required 
+                           min="{{ now.strftime('%Y-%m-%d') }}">
+                </div>
+
+                <div class="mb-3">
+                    <label for="time_slot" class="form-label">Select Time Slot</label>
+                    <select class="form-select" id="time_slot" name="time_slot" required>
+                        <option value="" selected disabled>Choose a time slot...</option>
+                        <option value="06:00">6:00 AM</option>
+                        <option value="07:00">7:00 AM</option>
+                        <option value="08:00">8:00 AM</option>
+                        <option value="09:00">9:00 AM</option>
+                        <option value="10:00">10:00 AM</option>
+                        <option value="11:00">11:00 AM</option>
+                        <option value="12:00">12:00 PM</option>
+                        <option value="13:00">1:00 PM</option>
+                        <option value="14:00">2:00 PM</option>
+                        <option value="15:00">3:00 PM</option>
+                        <option value="16:00">4:00 PM</option>
+                        <option value="17:00">5:00 PM</option>
+                        <option value="18:00">6:00 PM</option>
+                        <option value="19:00">7:00 PM</option>
+                        <option value="20:00">8:00 PM</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Book Now</button>
+            </form>
+        </div>
+    </div>
+
+    <h3 class="mb-3">Your Bookings</h3>
+    {% if bookings %}
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Gym</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Booked On</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                <tr>
+                    <td>{{ booking.gym.name }} - {{ booking.gym.location }}</td>
+                    <td>{{ booking.date.strftime('%Y-%m-%d') }}</td>
+                    <td>{{ booking.time_slot }}</td>
+                    <td>{{ booking.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        You don't have any bookings yet.
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    // Set minimum date to today
+    document.getElementById('date').min = new Date().toISOString().split('T')[0];
+</script>
+{% endblock %}

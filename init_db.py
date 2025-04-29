@@ -1,5 +1,5 @@
 from app import create_app, db
-from app.models import User, Gym, Exercise, Workout, WorkoutExercise, Analytics
+from app.models import User, Gym, Exercise, Workout, WorkoutExercise
 
 def init_db():
     app = create_app()
@@ -15,10 +15,14 @@ def init_db():
                 is_admin=True,
                 is_active=True
             )
-            admin.set_password('admin')
+            admin.set_password('admin123')
             db.session.add(admin)
             db.session.commit()
-            print("Created admin user with username: admin and password: admin")
+            print("Created admin user")
+
+        # Initialize preset exercises
+        Exercise.initialize_preset_exercises()
+        print("Initialized preset exercises")
 
 if __name__ == '__main__':
     init_db()
